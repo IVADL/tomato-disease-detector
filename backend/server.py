@@ -1,12 +1,15 @@
 from fastapi import FastAPI, File
+from fastapi.logger import logger
 from starlette.responses import Response
 
-from classification import get_model
+import uuid
+
+from detection import get_model as get_det_model
 
 import io
 from PIL import Image
 
-model = get_model("./models/mobilenet_v2_checkpoint_202101281638.hdf5")
+detector_model = get_det_model("./weights/yolov5s_tomato_3classes.pt")
 
 app = FastAPI(
     title="Plant Disease Detector",
@@ -15,10 +18,31 @@ app = FastAPI(
 )
 
 
-@app.post("/classification")
-def get_predict_disease_result(file: bytes = File(...)):
-    """"""
-    image = Image.open(io.BytesIO(file)).convert("RGB")
-    pred = model.prediction(image_data=image)
+# @app.post("/classification")
+# def get_predict_disease_classification(file: bytes = File(...)):
+#     """"""
+#     image = Image.open(io.BytesIO(file)).convert("RGB")
+#     pred = cls_model.prediction(image_data=image)
 
-    return Response(content=pred, status_code=200)
+#     return Response(content=pred, status_code=200)
+
+
+@app.post("/detection")
+def get_predict_disease_detector(file: bytes = File(...)):
+    name = f"./data/{str(uuid.uuid4())}.png"
+
+    logger.info("get image")
+    image = Image.open(io.BytesIO(file)).convert("RGB")
+    image.save(name)
+
+    logger.info("save image")
+    try:
+        converted_img = detector_model.detect("./data/", image_size=416)
+        converted_img = Image.fromarray(converted_img)
+        bytes_io = io.BytesIO()
+        converted_img.save(bytes_io, format="PNG")
+    except Exception as e:
+        logger.warning(e)
+
+    return Response(bytes_io.getvalue(), media_type="image/png")
+    # return StreamingResponse(content=converted_img, media_type="image/png")
