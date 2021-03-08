@@ -1,4 +1,10 @@
-FROM tiangolo/uvicorn-gunicorn:python3.8
+FROM tiangolo/uvicorn-gunicorn:python3.8-slim
+
+RUN apt-get update
+RUN apt-get install ffmpeg libsm6 libxext6  -y
+RUN apt-get install git -y
+
+RUN python -m pip install --upgrade pip
 
 RUN mkdir /backend
 
