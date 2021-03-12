@@ -9,7 +9,7 @@ from detection import get_model as get_det_model
 import io
 from PIL import Image
 
-detector_model = get_det_model("./weights/yolov5s_tomato_3classes.pt")
+detector_model = get_det_model("./weights/yolov5s_tomato_7classes.pt")
 
 app = FastAPI(
     title="Plant Disease Detector",
@@ -32,7 +32,12 @@ def get_predict_disease_detector(file: bytes = File(...)):
     name = f"./data/{str(uuid.uuid4())}.png"
 
     logger.info("get image")
-    image = Image.open(io.BytesIO(file)).convert("RGB")
+    image = Image.open(io.BytesIO(file))#.convert("RGB")
+
+    # opencv save -> bgr / PIL Image - open RGB ==> need convert bgr to rgb
+    b, g, r = image.split()
+    image = Image.merge("RGB", (r, g, b))
+
     image.save(name)
 
     logger.info("save image")
