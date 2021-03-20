@@ -120,6 +120,6 @@ class DetectorModel:
                 return im0
 
 
-if __name__ == "__main__":
-    detector_model = DetectorModel("backend/weights/yolov5s_tomato_3classes.pt")
-    detector_model.detect("backend/data/", image_size=416)
+# if __name__ == "__main__":
+#     detector_model = DetectorModel("backend/weights/yolov5s_tomato_3classes.pt")
+#     detector_model.detect("backend/data/", image_size=416)
