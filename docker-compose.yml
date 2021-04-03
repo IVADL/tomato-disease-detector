@@ -8,6 +8,8 @@ services:
     networks:
       - deploy_network
     container_name: backend
+    volumes:
+      - lib-volume:/var/lib/assets
 
   streamlit:
     build: frontend/
@@ -18,6 +20,11 @@ services:
     networks:
       - deploy_network
     container_name: frontend
+    volumes:
+      - lib-volume:/var/lib/assets
+
+volumes:
+  lib-volume:
 
 networks:
   deploy_network:
