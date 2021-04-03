@@ -69,6 +69,9 @@ def run_app():
                 original_image = Image.open(input_data).convert("RGB")
                 converted_image = pred.content
                 converted_image = Image.open(io.BytesIO(converted_image)).convert("RGB")
+                r, g, b = converted_image.split()
+                converted_image = Image.merge("RGB", (b,g,r))
+
                 col1.header("Original")
                 col1.image(original_image, use_column_width=True)
                 col2.header("Detected")
@@ -82,18 +85,14 @@ def run_app():
             col1.header("Original")
             col2.header("Detected")
             col1.video(input_data.read(), format="video/mp4")
-
             # video_path = "/var/lib/assets/video1.mp4"
             # with open(video_path, "wb") as wfile:
             #     wfile.write(input_data.read())
             resp = detect_video(input_data.read(), backend)
             detected_content = resp.content
             detected_content = io.BytesIO(detected_content)
-
             col2.video(detected_content, format="video/mp4")
-
             # col2.video(pred, format="video/mp4")
-
 
 if __name__ == "__main__":
     main()
