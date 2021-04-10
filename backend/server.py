@@ -1,11 +1,10 @@
-from fastapi import FastAPI, File
+from fastapi import FastAPI, File, BackgroundTasks
 from fastapi.logger import logger
-from fastapi.responses import Response, FileResponse
+from fastapi.responses import Response
 
-import uuid
-import tempfile
 import cv2
-import os
+
+import asyncio
 
 from detection import get_model as get_det_model
 
@@ -21,9 +20,11 @@ app = FastAPI(
     version="0.1.0",
 )
 
+tasks = {}
+
 
 @app.post("/detection/image")
-async def post_predict_disease_detector_image(file: bytes = File(...)):
+def post_predict_disease_detector_image(file: bytes = File(...)):
 
     logger.info("get image")
     image = Image.open(io.BytesIO(file))  # .convert("RGB")
@@ -38,58 +39,24 @@ async def post_predict_disease_detector_image(file: bytes = File(...)):
 
 
 @app.post("/detection/video")
-def post_predict_disease_detector_video(file: bytes = File(...)):
-    file_id = str(uuid.uuid4())
-    name = f"./data/results/{file_id}.mp4"
+async def post_predict_disease_detector_video(background_tasks: BackgroundTasks):
+    logger.info(f"Post Success Video")
+    name = f"/var/lib/assets/detect1.mp4"
+    logger.info(f"file: {name}")
 
-    logger.info(f"file: {file}")
+    video_path = "/var/lib/assets/video1.mp4"
+    cap = cv2.VideoCapture(video_path)
 
-    tfile = tempfile.NamedTemporaryFile(delete=False)
-    tfile.write(file)
-
-    cap = cv2.VideoCapture(tfile.name)
-    detector_model.detect(cap, image_size=416, video=True, save_path=name)
-    video_file = open(name, "rb")
-    video_bytes = video_file.read()
-
-    return Response(video_bytes, media_type="video/mp4")
-
-
-# @app.post("/detection/video")
-# def post_predict_disease_detector_video():
-
-#     file_id = str(uuid.uuid4())
-#     name = f"/var/lib/assets/{file_id}.mp4"
-
-#     logger.info(file)
-#     cap = cv2.VideoCapture(file)
-
-#     try:
-#         detector_model.detect(cap, image_size=416, video=True, save_path=name)
-#     except Exception as e:
-#         logger.warning(e)
-
-#     return Response(status_code=202, content=name)
+    background_tasks.add_task(
+        detector_model.detect, cap, image_size=416, video=True, save_path=name
+    )
+    # asyncio.create_task(
+    #     detector_model.detect(cap, image_size=416, video=True, save_path=name)
+    # )
 
 
-# @app.get("/detection/video/status")
-# def get_predict_disease_detector_status():
-#     try:
-#         status = detector_model.status
-#         progress = detector_model.progress
-#         return Response(status_code=202, content=dict(status=status, progress=progress))
-#     except Exception as e:
-#         logger.warning(e)
+@app.get("/detection/video/status")
+async def get_predict_disease_detector_video():
+    status, progress, save_path = detector_model.get_status()
 
-
-# @app.get("/detection/video/result")
-# def get_predict_disease_detector_video():
-#     try:
-#         status = detector_model.status
-#         if status == "Success" and os.path.isfile(detector_model.save_dir):
-#             # video_result = open(f"./data/results/{job_id}.mp4", mode="rb")
-#             return FileResponse(detector_model.save_dir, media_type="video/mp4")
-#         else:
-#             return dict(status="Error")
-#     except Exception as e:
-#         logger.warning(e)
+    return {"status": status, "progress": progress, "save_path": save_path}

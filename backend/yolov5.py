@@ -2,6 +2,7 @@ import torch
 from numpy import random
 import cv2
 import numpy as np
+from fastapi.logger import logger
 
 from models.experimental import attempt_load
 from utils.general import (
@@ -44,7 +45,12 @@ class DetectorModel:
         )
         self.colors = [[random.randint(0, 255) for _ in range(3)] for _ in self.names]
 
+    def get_status(self):
+        return self.status, self.progress, self.save_path
+
     def detect(self, source, image_size, save=False, video=False, save_path=None):
+
+        logger.info("Start Detection")
 
         stride = int(self.model.stride.max())  # model stride
         image_size = check_img_size(image_size, s=stride)  # check img_size
@@ -54,6 +60,7 @@ class DetectorModel:
         dataset = LoadData(source, img_size=image_size, stride=stride, video=video)
 
         self.status = "In Progress"
+        self.save_path = save_path
 
         # Run inference
         if self.device.type != "cpu":
@@ -123,9 +130,10 @@ class DetectorModel:
                             save_path, cv2.VideoWriter_fourcc(*fourcc), fps, (w, h)
                         )
                     vid_writer.write(im0)
+        logger.info("Finish Detection")
         self.progress = 100
         self.status = "Success"
-        self.save_path = save_path
+
         if not video:
             return im0
 
