@@ -78,6 +78,9 @@ def run_app():
                 original_image = Image.open(input_data).convert("RGB")
                 converted_image = pred.content
                 converted_image = Image.open(io.BytesIO(converted_image)).convert("RGB")
+                r, g, b = converted_image.split()
+                converted_image = Image.merge("RGB", (b, g, r))
+
                 col1.header("Original")
                 col1.image(original_image, use_column_width=True)
                 col2.header("Detected")
