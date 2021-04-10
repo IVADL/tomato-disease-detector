@@ -95,10 +95,8 @@ def run_app():
             temp_path = "/var/lib/assets"
             for t in os.listdir(temp_path):
                 os.remove(temp_path + "/" + t)
-            col1.header("Original")
-            col2.header("Detected")
+
             origin_video = input_data.read()
-            col1.video(origin_video, format="video/mp4")
 
             video_path = "/var/lib/assets/video1.mp4"
             if os.path.isfile(video_path):
@@ -137,6 +135,9 @@ def run_app():
             video_file = open(convert_path, "rb")
             video_bytes = video_file.read()
 
+            col1.header("Original")
+            col2.header("Detected")
+            col1.video(origin_video, format="video/mp4")
             col2.video(video_bytes, format="video/mp4")
 
 
