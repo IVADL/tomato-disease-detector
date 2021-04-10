@@ -128,8 +128,13 @@ def run_app():
 
                 time.sleep(1)
 
+            time.sleep(3)
+
             save_path = "/var/lib/assets/detect1.mp4"
-            video_file = open(save_path, "rb")
+            convert_path = "/var/lib/assets/detect2.mp4"
+            os.system(f"ffmpeg -i {save_path} -vcodec libx264 {convert_path}")
+
+            video_file = open(convert_path, "rb")
             video_bytes = video_file.read()
 
             col2.video(video_bytes, format="video/mp4")
