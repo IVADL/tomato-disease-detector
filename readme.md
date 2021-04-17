@@ -1,5 +1,5 @@
 # Tomato Disease Detector
-![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FIVADL/tomato-disease-detector) ![License](https://img.shields.io/github/license/harimkang/tomato-disease-detector?style=plastic) ![Stars](https://img.shields.io/github/stars/IVADL/PDD-prototype?style=social)
+![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FIVADL/tomato-disease-detector) ![License](https://img.shields.io/github/license/IVADL/tomato-disease-detector?style=plastic) ![Stars](https://img.shields.io/github/stars/IVADL/PDD-prototype?style=social)
 
 ![love and jo](https://user-images.githubusercontent.com/38045080/115104832-01db6b80-9f96-11eb-9710-2f146eabe04f.png)
 
